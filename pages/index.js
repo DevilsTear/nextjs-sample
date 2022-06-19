@@ -14,16 +14,32 @@ function HomePage(props){
     </div>;
 }
 
-export async function getStaticProps(){
+export async function getStaticProps(context){
     const dataFilePath = path.join(process.cwd(), 'data', 'dummy-backend.json');
     const jsonData = await fs.readFile(dataFilePath);
     const data = JSON.parse(jsonData);
+
+    if (data){
+        return { 
+            redirect: {
+                destination: 'no-data'
+            }
+        };
+    }
+
+    if (data.products.length === 0){
+        return { notFound: true};
+    }
 
     return {
         props: {
             products: data.products
         },
-        revalidate: 10 // second(s) - Incremental Static Generation (ISR)
+        revalidate: 10, // second(s) - Incremental Static Generation (ISR)
+        // notFound : true,
+        // redirect: {
+        //     destination: 'no-data'
+        // },
     };
 }
 
