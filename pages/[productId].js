@@ -5,6 +5,10 @@ import fs from 'fs/promises';
 function ProductDetailPage(props){
     const { productDetails } = props;
 
+    if(!productDetails){
+        return <div>Loading!..</div>
+    }
+
     return (
         <Fragment>
             <h1>{productDetails.title}</h1>
@@ -13,14 +17,22 @@ function ProductDetailPage(props){
     )
 }
 
+async function getData(){
+    const dataFilePath = path.join(process.cwd(), 'data', 'dummy-backend.json');
+    const jsonData = await fs.readFile(dataFilePath);
+    const data = JSON.parse(jsonData);
+
+    return data;
+}
+
 export async function getStaticPaths(){
+    const data = await getData();
+
+    const pathParams = data.products.map(product => ({params: {productId: product.id}}));
+
     return {
-        paths:[
-            { params: { productId: 'p1' } }, 
-            { params: { productId: 'p2' } }, 
-            { params: { productId: 'p3' } }, 
-        ],
-        fallback: false
+        paths: pathParams,
+        fallback: false // 'blocking' value should be used unless checking the productDetails fully loaded
     };
 }
 
@@ -31,9 +43,7 @@ export async function getStaticProps(context){
 
     const productId = params.productId;
 
-    const dataFilePath = path.join(process.cwd(), 'data', 'dummy-backend.json');
-    const jsonData = await fs.readFile(dataFilePath);
-    const data = JSON.parse(jsonData);
+    const data = await getData()
     if (!data){
         return { 
             redirect: {
