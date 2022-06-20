@@ -1,4 +1,6 @@
 import {useRouter} from 'next/router';
+import { Fragment } from 'react';
+import Head from 'next/head';
 
 // /blogs/2022
 // /blogs/2022/06
@@ -8,9 +10,15 @@ function BlogListPage(){
     
     console.log(router.query.slug);
 
-    return <div>
-        <h1>Blogs {router.query.slug?.join('/')}</h1>
-    </div>;
+    return <Fragment>
+        <Head>
+            <title>Blogs</title>
+            <meta name='description' content={`All Blogs for ${router.query.slug?.join('/')}`} />
+        </Head>
+        <div>
+            <h1>Blogs {router.query.slug?.join('/')}</h1>
+        </div>
+    </Fragment>;
 }
 
 export default BlogListPage;
